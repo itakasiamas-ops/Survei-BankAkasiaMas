@@ -392,7 +392,7 @@
    KONFIGURASI — ganti URL ini dengan Web App URL Apps Script-mu
    (lihat panduan setup-google-sheets.md)
    ========================================================= */
-const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbxuSFzNMrQbysc7ywCuxi1SZHBbcArOo0XxQBdAxL2YE6oHfj9aM5pI7npPtSNXbkmNig/exec";
+const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzaIQQVg5q0WIqTlfrtuhSuaZ1WP_El0tPEBhFCm_eoOrFR2cWb-z0RlAKCo3bBOBwU/exec";
 
 /* ============ DATA PERTANYAAN ============ */
 const questions = [
@@ -701,7 +701,7 @@ function submitSurvey(){
     whatsapp: (answers.identitas && answers.identitas.wa) || ""
   };
 
-  if(!GOOGLE_SHEET_WEBAPP_URL || GOOGLE_SHEET_WEBAPP_URL.indexOf("https://script.google.com/macros/s/AKfycbxuSFzNMrQbysc7ywCuxi1SZHBbcArOo0XxQBdAxL2YE6oHfj9aM5pI7npPtSNXbkmNig/exec") === 0){
+  if(!GOOGLE_SHEET_WEBAPP_URL || GOOGLE_SHEET_WEBAPP_URL.indexOf("https://script.google.com/macros/s/AKfycbzaIQQVg5q0WIqTlfrtuhSuaZ1WP_El0tPEBhFCm_eoOrFR2cWb-z0RlAKCo3bBOBwU/exec") === 0){
     console.warn("GOOGLE_SHEET_WEBAPP_URL belum diatur. Data tidak terkirim ke Google Sheets:", payload);
     showThanks();
     return;
