@@ -742,7 +742,10 @@ function attachHandlers(q){
     card.querySelectorAll(".option").forEach(el=>{
       el.addEventListener("click", ()=>{
         answers[q.id] = el.getAttribute("data-value");
-        render();
+        // update tampilan terpilih di tempat, tanpa render() ulang -> tidak ada efek berbayang
+        card.querySelectorAll(".option").forEach(opt=>{
+          opt.classList.toggle("selected", opt.getAttribute("data-value") === answers[q.id]);
+        });
         setTimeout(goNext, 650); // jeda lebih lama sebelum lanjut, biar terasa & tidak buru-buru
       });
     });
@@ -763,7 +766,12 @@ function attachHandlers(q){
           arr = [...arr, val];
         }
         answers[q.id] = arr;
-        render();
+        // update tampilan terpilih di tempat, tanpa render() ulang -> tidak ada efek berbayang
+        card.querySelectorAll(".option").forEach(opt=>{
+          opt.classList.toggle("selected", arr.includes(opt.getAttribute("data-value")));
+        });
+        const hintEl = card.querySelector(".hint-max");
+        if(hintEl) hintEl.textContent = `Maksimal ${q.max} pilihan`;
       });
     });
   }
