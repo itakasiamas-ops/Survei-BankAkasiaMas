@@ -313,9 +313,30 @@
     margin-top:12px;
     display:flex;
     align-items:center;
-    gap:6px;
+    gap:7px;
+    padding:10px 12px;
+    border-radius:11px;
+    background:transparent;
+    transition:background .25s ease, color .25s ease;
   }
   .hint-max svg{ width:13px; height:13px; stroke:var(--gold-600); flex-shrink:0; }
+  /* pengingat lembut: 1 dari maks dipilih — bukan error, sekadar ajakan */
+  .hint-max.state-partial{
+    background:rgba(240,180,0,0.13);
+    color:var(--maroon-800);
+    font-weight:600;
+    animation: hintPulse .5s ease;
+  }
+  .hint-max.state-partial svg{ stroke:var(--maroon-700); }
+  @keyframes hintPulse{
+    0%{ transform:scale(0.98); } 50%{ transform:scale(1.015); } 100%{ transform:scale(1); }
+  }
+  /* sudah lengkap 2/2 */
+  .hint-max.state-full{
+    background:rgba(46,139,87,0.08);
+    color:var(--maroon-800);
+  }
+  .hint-max.state-full svg{ stroke:#2e8b57; }
 
   .fields{
     display:flex;
@@ -508,6 +529,72 @@
   .thanks .btn-restart svg{ width:15px; height:15px; transition:transform .3s ease; }
   .thanks .btn-restart:hover svg{ transform:rotate(180deg); }
 
+  /* ============ Layar Mengirim (loading) ============ */
+  .sending{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    justify-content:center;
+    flex:1;
+    padding:16px 6px;
+    animation: cardIn .4s cubic-bezier(.22,1,.36,1) both;
+  }
+  .sending .spinner{
+    width:52px; height:52px;
+    border-radius:50%;
+    border:4px solid rgba(94,20,20,0.12);
+    border-top-color: var(--maroon-700);
+    margin-bottom:22px;
+    animation: spin .8s linear infinite;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  .sending h2{
+    font-family:'Fraunces', serif;
+    font-size:22px;
+    font-weight:600;
+    color:var(--maroon-950);
+    margin-bottom:8px;
+    animation: fadeSlideUp .4s ease .1s both;
+  }
+  .sending p{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    max-width:280px;
+    animation: fadeSlideUp .4s ease .18s both;
+  }
+  .sending.sending-error .spinner{ display:none; }
+  .sending.sending-error .error-icon{
+    width:52px; height:52px;
+    border-radius:50%;
+    background:#fdeceb;
+    display:flex; align-items:center; justify-content:center;
+    margin-bottom:22px;
+    animation: sealBigIn .5s cubic-bezier(.34,1.56,.64,1) both;
+  }
+  .sending.sending-error .error-icon svg{ width:24px; height:24px; }
+  .sending .btn-retry{
+    margin-top:24px;
+    background:linear-gradient(180deg, var(--maroon-700), var(--maroon-950));
+    color:var(--gold-100);
+    border:none;
+    padding:14px 26px;
+    border-radius:13px;
+    font-family:inherit;
+    font-weight:700;
+    font-size:14px;
+    cursor:pointer;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    box-shadow:0 12px 26px -12px rgba(74,14,14,0.65);
+    transition:transform .1s ease;
+    animation: fadeSlideUp .4s ease .26s both;
+  }
+  .sending .btn-retry:active{ transform:scale(0.98); }
+  .sending .btn-retry svg{ width:15px; height:15px; }
+
   .confetti-dot{
     position:absolute;
     border-radius:50%;
@@ -572,7 +659,8 @@ const ICONS = {
   arrow: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>`,
   back: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>`,
   refresh: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M5.5 15a8 8 0 1 0 1.5-9M18.5 9a8 8 0 0 0-1.5-3"/></svg>`,
-  info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 8h.01"/></svg>`
+  info: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5.5M12 8h.01"/></svg>`,
+  check: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>`
 };
 
 /* ============ DATA PERTANYAAN ============ */
@@ -733,7 +821,7 @@ function render(){
                  <span class="mark square"></span>${opt}
                </div>`;
     });
-    html += `<div class="hint-max">${ICONS.info}Maksimal ${q.max} pilihan</div>`;
+    html += `<div id="hintMaxSlot">${multiHintHTML((answers[q.id]||[]).length, q.max)}</div>`;
   }
 
   if(q.type === "contact"){
@@ -762,6 +850,19 @@ function render(){
 
   card.innerHTML = html;
   attachHandlers(q);
+}
+
+/* Indikator jumlah pilihan dinamis untuk pertanyaan multi-pilih.
+   Ini bukan validasi wajib — hanya pengingat lembut. "Maksimal 2"
+   tetap berarti nasabah boleh lanjut walau baru pilih 1. */
+function multiHintHTML(count, max){
+  if(count >= max){
+    return `<div class="hint-max state-full">${ICONS.check}<span>${count}/${max} dipilih — alasan Anda sudah lengkap</span></div>`;
+  }
+  if(count === 1){
+    return `<div class="hint-max state-partial">${ICONS.info}<span>${count}/${max} dipilih — boleh tambah 1 alasan lagi kalau relevan (opsional)</span></div>`;
+  }
+  return `<div class="hint-max">${ICONS.info}<span>Pilih hingga ${max} alasan yang paling sesuai dengan Anda</span></div>`;
 }
 
 function escapeAttr(str){
@@ -799,6 +900,8 @@ function attachHandlers(q){
         card.querySelectorAll(".option").forEach(opt=>{
           opt.classList.toggle("selected", arr.includes(opt.getAttribute("data-value")));
         });
+        const hintSlot = document.getElementById("hintMaxSlot");
+        if(hintSlot) hintSlot.innerHTML = multiHintHTML(arr.length, q.max);
       });
     });
   }
@@ -862,7 +965,7 @@ function goNext(){
   if(current < total - 1){
     transitionTo(()=>{ current++; render(); });
   } else {
-    transitionTo(()=> submitSurvey());
+    transitionTo(()=> showSending());
   }
 }
 
@@ -885,11 +988,22 @@ function transitionTo(action){
   }, 320);
 }
 
-/* ============ SUBMIT KE GOOGLE SHEETS ============ */
-function submitSurvey(){
-  const nextBtn = document.getElementById("btnNext");
-  if(nextBtn){ nextBtn.disabled = true; nextBtn.textContent = "Mengirim..."; }
+/* ============ LAYAR "MENGIRIM..." + SUBMIT KE GOOGLE SHEETS ============ */
 
+// Ganti isi card jadi layar loading yang jelas (spinner + teks),
+// bukan sekadar fade card kosong yang bikin bingung/terlihat "berbayang".
+function showSending(){
+  card.innerHTML = `
+    <div class="sending">
+      <div class="spinner"></div>
+      <h2>Mengirim jawaban...</h2>
+      <p>Mohon tunggu sebentar, jangan tutup atau refresh halaman ini.</p>
+    </div>
+  `;
+  doSubmit();
+}
+
+function doSubmit(){
   const payload = {
     timestamp: new Date().toISOString(),
     tahu_bpr: answers.tahu_bpr || "",
@@ -903,7 +1017,7 @@ function submitSurvey(){
     whatsapp: (answers.identitas && answers.identitas.wa) || ""
   };
 
-  if(!GOOGLE_SHEET_WEBAPP_URL || GOOGLE_SHEET_WEBAPP_URL.indexOf("PASTE_URL") === 0){
+  if(!GOOGLE_SHEET_WEBAPP_URL || GOOGLE_SHEET_WEBAPP_URL.indexOf("https://script.google.com/macros/s/AKfycbzaIQQVg5q0WIqTlfrtuhSuaZ1WP_El0tPEBhFCm_eoOrFR2cWb-z0RlAKCo3bBOBwU/exec") === 0){
     console.warn("GOOGLE_SHEET_WEBAPP_URL belum diatur. Data tidak terkirim ke Google Sheets:", payload);
     showThanks();
     return;
@@ -918,10 +1032,24 @@ function submitSurvey(){
   .then(()=> showThanks())
   .catch((err)=>{
     console.error(err);
-    const nb = document.getElementById("btnNext");
-    if(nb){ nb.disabled = false; nb.textContent = "Kirim Jawaban"; }
-    showError("Gagal mengirim jawaban. Periksa koneksi internet Anda dan coba lagi.");
+    showSendError();
   });
+}
+
+// Layar error kirim, dengan tombol coba lagi yang jelas
+// (menggantikan pesan error kecil di bawah tombol yang dulunya
+// tidak relevan lagi karena card sudah tidak menampilkan opsi).
+function showSendError(){
+  card.innerHTML = `
+    <div class="sending sending-error">
+      <div class="error-icon">${ICONS.warn}</div>
+      <h2>Gagal Mengirim</h2>
+      <p>Periksa koneksi internet Anda, lalu coba lagi. Jawaban Anda masih tersimpan.</p>
+      <button class="btn-retry" id="btnRetry">${ICONS.refresh}Coba Lagi</button>
+    </div>
+  `;
+  const retryBtn = document.getElementById("btnRetry");
+  if(retryBtn) retryBtn.addEventListener("click", showSending);
 }
 
 function showThanks(){
