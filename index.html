@@ -683,6 +683,13 @@ const questions = [
     type: "single",
     options: ["Ya", "Tidak Tahu", "Pernah dengar"]
   },
+  /* =========================================================
+     DI-NONAKTIFKAN SEMENTARA (tidak tampil di survey).
+     Untuk mengaktifkan lagi: hapus baris pembatas komentar
+     tepat di atas objek "kebutuhan_finansial" di bawah ini,
+     dan baris penutup komentar tepat setelah objek ini.
+     Kolom "Kebutuhan Finansial Utama" di Google Sheet tetap
+     ada, tapi akan selalu kosong selama pertanyaan ini nonaktif.
   {
     id: "kebutuhan_finansial",
     icon: "wallet",
@@ -699,6 +706,7 @@ const questions = [
       "Masih ingin mengetahui pilihan yang sesuai"
     ]
   },
+  ========================================================= */
   {
     id: "produk_dibutuhkan",
     icon: "layers",
@@ -732,6 +740,13 @@ const questions = [
       "Biaya yang terjangkau"
     ]
   },
+  /* =========================================================
+     DI-NONAKTIFKAN SEMENTARA (tidak tampil di survey).
+     Untuk mengaktifkan lagi: hapus baris pembatas komentar
+     tepat di atas objek "kebutuhan_dana" di bawah ini,
+     dan baris penutup komentar tepat setelah objek ini.
+     Kolom "Kebutuhan Penggunaan Dana" di Google Sheet tetap
+     ada, tapi akan selalu kosong selama pertanyaan ini nonaktif.
   {
     id: "kebutuhan_dana",
     icon: "target",
@@ -747,6 +762,7 @@ const questions = [
       "Kebutuhan lainnya"
     ]
   },
+  ========================================================= */
   {
     id: "prioritas_produk_keuangan",
     icon: "flag",
